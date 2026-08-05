@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reclamos Internet</title>
+
+  <style>
+    :root {
+      --bg: #f5f4f0;
+      --surface: #ffffff;
+      --surface-2: #f1efe8;
+      --text: #2c2c2a;
+      --text-secondary: #5f5e5a;
+      --text-muted: #888780;
+      --border: #d3d1c7;
+      --accent: #185fa5;
+      --accent-bg: #e6f1fb;
+      --pro: #534ab7;
+      --pro-bg: #eeedfe;
+      --success: #3b6d11;
+      --success-bg: #eaf3de;
+      --warning: #854f0b;
+      --warning-bg: #faeeda;
+      --danger: #a32d2d;
+      --danger-bg: #fcebeb;
+      --radius: 10px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding: 1rem;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 20px;
+      font-weight: 600;
+      margin: 0.5rem 0 1rem;
+    }
+
+    .card {
+      background: var(--surface);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      padding: 1rem 1.1rem;
+      margin-bottom: 1rem;
+    }
+
+    .card p.title {
+      font-weight: 600;
+      font-size: 15px;
+      margin: 0 0 12px;
+    }
+
+    input,
+    select,
+    textarea,
+    button {
+      font-family: inherit;
+      font-size: 15px;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 50px;
+    }
+
+    button {
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      border-radius: var(--radius);
+      padding: 8px 10px;
+      cursor: pointer;
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    #btn-add {
+      width: 100%;
+      background: var(--text);
+      color: #fff;
+      border: none;
+      font-weight: 500;
+      padding: 10px;
+    }
+
+    #err {
+      color: var(--danger);
+      font-size: 13px;
+      margin: 0;
+      display: none;
+    }
+
+    .stats {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 1rem;
+    }
+
+    .stat {
+      flex: 1;
+      background: var(--surface-2);
+      border-radius: var(--radius);
+      padding: 0.75rem 1rem;
+    }
+
+    .stat p.label {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin: 0;
+    }
+
+    .stat p.value {
+      font-size: 22px;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .filters {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 1rem;
+    }
+
+    .filters button {
+      flex: 1;
+      font-size: 13px;
+      padding: 6px 8px;
+    }
+
+    .filters button.active {
+      border-color: var(--text);
+      font-weight: 500;
+    }
+
+    .item {
+      background: var(--surface);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      padding: 0.75rem 1rem;
+      margin-bottom: 8px;
+    }
+
+    .item-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .item-meta {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .item-meta .fecha {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin: 0;
+    }
+
+    .badge-tipo {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: var(--radius);
+      white-space: nowrap;
+    }
+
+    .badge-tipo.cablevision {
+      background: var(--accent-bg);
+      color: var(--accent);
+    }
+
+    .badge-tipo.internet {
+      background: var(--pro-bg);
+      color: var(--pro);
+    }
+
+    .motivo {
+      font-size: 14px;
+      margin: 4px 0 0;
+      word-break: break-word;
+    }
+
+    .atendio {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin: 4px 0 0;
+    }
+
+    .badge-estado {
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: var(--radius);
+      white-space: nowrap;
+    }
+
+    .badge-estado.resuelto {
+      background: var(--success-bg);
+      color: var(--success);
+    }
+
+    .badge-estado.pendiente {
+      background: var(--warning-bg);
+      color: var(--warning);
+    }
+
+    .item-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .item-actions button {
+      font-size: 13px;
+      padding: 6px 8px;
+    }
+
+    .btn-toggle {
+      flex: 1;
+    }
+
+    #empty {
+      color: var(--text-muted);
+      font-size: 14px;
+      text-align: center;
+      padding: 1rem 0;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Reclamos internet</h1>
+
+  <div class="card">
+    <p class="title">Nuevo reclamo</p>
+    <input type="date" id="f-fecha" />
+    <select id="f-tipo">
+      <option value="Cablevisión">Cablevisión</option>
+      <option value="Internet">Internet</option>
+    </select>
+    <input type="text" id="f-atendio" placeholder="Nombre de quien te atendió" />
+    <textarea id="f-motivo" placeholder="Motivo del reclamo"></textarea>
+    <button id="btn-add">+ Agregar reclamo</button>
+    <p id="err">Completá al menos la fecha y el motivo.</p>
+  </div>
+
+  <div class="stats">
+    <div class="stat">
+      <p class="label">Pendientes</p>
+      <p class="value" id="stat-pend">0</p>
+    </div>
+    <div class="stat">
+      <p class="label">Resueltos</p>
+      <p class="value" id="stat-res">0</p>
+    </div>
+  </div>
+
+  <div class="filters">
+    <button data-filter="todos" class="btn-filter active">Todos</button>
+    <button data-filter="Cablevisión" class="btn-filter">Cablevisión</button>
+    <button data-filter="Internet" class="btn-filter">Internet</button>
+  </div>
+
+  <div id="list"></div>
+  <p id="empty" style="display:none;">Todavía no cargaste ningún reclamo.</p>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    (async function () {
+
+      const supabaseUrl = "https://myoyhqovckzfhlkwtpiz.supabase.co";
+
+      const supabaseKey = "sb_publishable_2c7ErJDsm9_yRrxIoJ5lfQ_RcGcd9a8";
+
+      const supabase = window.supabase.createClient(
+        supabaseUrl,
+        supabaseKey
+      );
+      const URL_RESPALDO = "https://script.google.com/macros/s/AKfycbyGZ_PtFmEo9P2T2ah7NFK8wqNbuY7QmDFJy3hEi4S9E08IKfaHXjh6YAoGjKIdKCSq/exec";
+
+      let items = [];
+      let filter = "todos";
+
+      function fmtFecha(iso) {
+        if (!iso) return '';
+        const [y, m, d] = iso.split('-');
+        return d + '/' + m + '/' + y;
+      }
+
+      async function load() {
+
+        const { data, error } = await supabase
+          .from("Reclamos")
+          .select("*")
+          .order("fecha", { ascending: false });
+
+        if (error) {
+          alert(error.message);
+          return;
+        }
+
+        items = data || [];
+
+        render();
+
+      }
+
+      function save() { }
+
+      function render() {
+        const list = document.getElementById('list');
+        const empty = document.getElementById('empty');
+        list.innerHTML = '';
+        const pend = items.filter(i => !i.resuelto).length;
+        const res = items.filter(i => i.resuelto).length;
+        document.getElementById('stat-pend').textContent = pend;
+        document.getElementById('stat-res').textContent = res;
+
+        const visible = filter === 'todos' ? items : items.filter(i => i.tipo === filter);
+
+        if (visible.length === 0) {
+          empty.style.display = 'block';
+          return;
+        }
+        empty.style.display = 'none';
+
+        const sorted = [...visible].sort((a, b) => (b.fecha || '').localeCompare(a.fecha || ''));
+
+        sorted.forEach(item => {
+          const div = document.createElement('div');
+          div.className = 'item';
+          const tipoClass = item.tipo === 'Cablevisión' ? 'cablevision' : 'internet';
+          const estadoClass = item.resuelto ? 'resuelto' : 'pendiente';
+          div.innerHTML = `
+        <div class="item-top">
+          <div style="min-width:0;">
+            <div class="item-meta">
+              <p class="fecha">${fmtFecha(item.fecha)}</p>
+              <span class="badge-tipo ${tipoClass}">${item.tipo}</span>
+            </div>
+            <p class="motivo">${escapeHtml(item.motivo || '')}</p>
+            ${item.atendio ? `<p class="atendio">Atendió: ${escapeHtml(item.atendio)}</p>` : ''}
+          </div>
+          <span class="badge-estado ${estadoClass}">${item.resuelto ? 'Resuelto' : 'Pendiente'}</span>
+        </div>
+        <div class="item-actions">
+          <button data-id="${item.id}" class="btn-toggle">${item.resuelto ? 'Marcar pendiente' : 'Marcar resuelto'}</button>
+          <button data-id="${item.id}" class="btn-del">Eliminar</button>
+        </div>
+      `;
+          list.appendChild(div);
+        });
+
+        document.querySelectorAll(".btn-toggle").forEach(b => {
+          b.addEventListener("click", async () => {
+
+            const id = Number(b.getAttribute("data-id"));
+
+            const it = items.find(i => i.id == id);
+
+            if (!it) return;
+
+            const { error } = await supabase
+              .from("Reclamos")
+              .update({
+                resuelto: !it.resuelto
+              })
+              .eq("id", id);
+
+            if (error) {
+              alert(error.message);
+              return;
+            }
+
+            await load();
+
+          });
+        });
+        document.querySelectorAll(".btn-del").forEach(b => {
+          b.addEventListener("click", async () => {
+
+            if (!confirm("¿Eliminar este reclamo?")) return;
+
+            const id = Number(b.getAttribute("data-id"));
+
+            const { error } = await supabase
+              .from("Reclamos")
+              .delete()
+              .eq("id", id);
+
+            if (error) {
+              alert(error.message);
+              return;
+            }
+
+            await load();
+
+          });
+        });
+      }
+
+      function escapeHtml(str) {
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+      }
+
+      document.querySelectorAll('.btn-filter').forEach(b => {
+        b.addEventListener('click', () => {
+          filter = b.getAttribute('data-filter');
+          document.querySelectorAll('.btn-filter').forEach(x => x.classList.remove('active'));
+          b.classList.add('active');
+          render();
+        });
+      });
+
+      document.getElementById("btn-add").addEventListener("click", async () => {
+
+        const fecha = document.getElementById("f-fecha").value;
+        const tipo = document.getElementById("f-tipo").value;
+        const atendio = document.getElementById("f-atendio").value.trim();
+        const motivo = document.getElementById("f-motivo").value.trim();
+
+        const err = document.getElementById("err");
+
+        if (!fecha || !motivo) {
+          err.style.display = "block";
+          return;
+        }
+
+        err.style.display = "none";
+
+        const { data, error } = await supabase
+          .from("Reclamos")
+          .insert([
+            {
+              fecha,
+              tipo,
+              atendio,
+              motivo,
+              resuelto: false
+            }
+          ])
+          .select()
+          .single();
+
+        if (error) {
+          alert(error.message);
+          return;
+        }
+        try {
+
+        } catch (e) {
+
+    alert(e);
+
+}
+
+        document.getElementById("f-atendio").value = "";
+        document.getElementById("f-motivo").value = "";
+
+        await load();
+
+      });
+
+      document.getElementById('f-fecha').value = new Date().toISOString().slice(0, 10);
+
+      await load();
+    })();
+  </script>
+</body>
+
+</html>
