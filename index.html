@@ -246,6 +246,24 @@
       flex: 1;
     }
 
+    #btn-limpiar {
+      display: block;
+      margin: 20px 0 25px 0;
+      padding: 10px 18px;
+      background: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    #btn-limpiar:hover {
+      background: #bb2d3b;
+    }
+
     #empty {
       color: var(--text-muted);
       font-size: 14px;
@@ -289,6 +307,7 @@
     <button data-filter="Internet" class="btn-filter">Internet</button>
     <button data-filter="Telefono Fijo" class="btn-filter">Telefono Fijo</button>
   </div>
+  <button id="btn-limpiar">Limpiar reclamos resueltos</button>
 
   <div id="list"></div>
   <p id="empty" style="display:none;">Todavía no cargaste ningún reclamo.</p>
@@ -319,10 +338,11 @@
 
       async function load() {
 
-        const {data, error} = await supabase
+        const { data, error } = await supabase
           .from("Reclamos")
           .select("*")
-          .order("fecha", {ascending: false});
+          .order("resuelto", { ascending: true })
+          .order("fecha", { ascending: false });
 
         if (error) {
           alert(error.message);
@@ -396,7 +416,7 @@
 
             if (!it) return;
 
-            const {error} = await supabase
+            const { error } = await supabase
               .from("Reclamos")
               .update({
                 resuelto: !it.resuelto
@@ -422,7 +442,7 @@
 
             const id = Number(b.getAttribute("data-id"));
 
-            const {error} = await supabase
+            const { error } = await supabase
               .from("Reclamos")
               .delete()
               .eq("id", id);
@@ -499,7 +519,7 @@
 
         err.style.display = "none";
 
-        const {data, error} = await supabase
+        const { data, error } = await supabase
           .from("Reclamos")
           .insert([
             {
@@ -530,6 +550,46 @@
 
         document.getElementById("f-atendio").value = "";
         document.getElementById("f-motivo").value = "";
+
+        await load();
+
+      });
+      document.getElementById("btn-limpiar").addEventListener("click", async () => {
+
+        // Obtener los IDs resueltos desde Google Sheets
+        const resp = await fetch(URL_GOOGLE, {
+          method: "POST",
+          body: JSON.stringify({
+            accion: "obtenerResueltos"
+          })
+        });
+
+        const ids = await resp.json();
+
+        if (!ids.length) {
+          alert("No hay reclamos resueltos para eliminar.");
+          return;
+        }
+
+        const confirmar = confirm(
+          `Se eliminarán ${ids.length} reclamo${ids.length === 1 ? "" : "s"} de Supabase.\n\n` +
+          "Los datos permanecerán guardados en Google Sheets.\n\n" +
+          "¿Deseás continuar?"
+        );
+
+        if (!confirmar) return;
+
+        const { error } = await supabase
+          .from("Reclamos")
+          .delete()
+          .in("id", ids);
+
+        if (error) {
+          alert(error.message);
+          return;
+        }
+
+        alert(`${ids.length} reclamo${ids.length === 1 ? "" : "s"} eliminado${ids.length === 1 ? "" : "s"} correctamente.`);
 
         await load();
 
